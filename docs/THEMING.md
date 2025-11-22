@@ -1,4 +1,4 @@
-# 🎨 Theming System Guide
+#  Theming System Guide
 
 This project implements a robust, variable-based theming system that supports both **Light/Dark modes** and **Color Presets**.
 

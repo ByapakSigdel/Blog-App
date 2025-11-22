@@ -1,4 +1,4 @@
-# 🏗️ Architecture & State Management
+#  Architecture & State Management
 
 ## State Management (Zustand)
 
