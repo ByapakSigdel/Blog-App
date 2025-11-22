@@ -26,13 +26,21 @@ The application leverages Next.js's built-in Image Optimization API.
     }
     ```
 
-### 3. Routing & Post Views (`app/posts/[id]`)
-The application uses Next.js App Router's dynamic routes for individual post views.
+### 4. Advanced Features
+We have implemented several advanced features to enhance the user experience and developer workflow.
 
-*   **Dynamic Route**: `app/posts/[id]/page.tsx` handles all individual post requests.
-*   **State Hydration Strategy**:
-    *   When navigating from the dashboard, the data is already present in the Zustand store.
-    *   **Direct Access/Refresh Handling**: If a user lands directly on a post URL (or refreshes), the store is initially empty. The `useEffect` hook detects this empty state and triggers `fetchPosts()` immediately to re-hydrate the store before attempting to find the specific post.
+*   **Form Validation**: We use `react-hook-form` combined with `yup` schemas to ensure data integrity.
+    *   **Schema**: Titles must be at least 5 characters, content at least 20.
+    *   **UX**: Real-time error messages and disabled submit buttons during processing.
+*   **Rich Text Editor**: A WYSIWYG editor powered by `react-quill-new` allows users to format their posts with bold, italics, lists, and more.
+    *   **Sanitization**: We use `dompurify` to sanitize HTML content before rendering to prevent XSS attacks.
+*   **Search & Filtering**:
+    *   **Search**: Filters posts by title or body content.
+    *   **Category**: Filters posts by specific categories (Technology, Design, etc.).
+    *   **Implementation**: Filtering happens client-side in the Zustand store selector `getFilteredPosts`.
+*   **Pagination**:
+    *   **Logic**: We calculate total pages based on the filtered results and the `postsPerPage` setting (default: 6).
+    *   **UI**: A custom pagination component allows navigation between pages.
 
 ## Troubleshooting
 
@@ -51,3 +59,7 @@ The application uses Next.js App Router's dynamic routes for individual post vie
 #### Animation Jitters
 *   **Cause**: Framer Motion layout thrashing or mismatched initial states.
 *   **Solution**: Ensure `layout.tsx` keys are stable and that `initial` vs `animate` properties in `PostCard.tsx` are valid CSS transform properties.
+
+#### Rich Text Editor Issues
+*   **Cause**: `document is not defined` error during build or runtime.
+*   **Solution**: The `ReactQuill` component must be dynamically imported with `{ ssr: false }` because it relies on the browser's `document` object which doesn't exist on the server.

@@ -14,6 +14,9 @@ A feature-rich, responsive blog application built with Next.js 14, TypeScript, a
 - **Dynamic Theming**: Robust light/dark mode with 5 distinct color presets (Zinc, Rose, Blue, Green, Orange).
 - **State Management**: Centralized store using Zustand for Authentication and Post management.
 - **Interactive UI**: Smooth page transitions and micro-interactions powered by Framer Motion.
+- **Rich Text Editing**: WYSIWYG editor for creating formatted blog posts.
+- **Advanced Filtering**: Search and category filtering with client-side pagination.
+- **Form Validation**: Robust form handling with Yup schemas and error feedback.
 - **Realistic Mock Data**: Deterministic image generation and realistic content seeding without a backend dependency.
 - **Responsive Design**: Fully responsive layout optimized for mobile, tablet, and desktop.
 

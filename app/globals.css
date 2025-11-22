@@ -23,104 +23,73 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
 }
 
 :root {
-  /* Base Light Theme (Slate) */
-  --background: #f8fafc; /* slate-50 */
-  --foreground: #0f172a; /* slate-900 */
+  /* Substack-inspired Light Theme */
+  --background: #ffffff;
+  --foreground: #1a1a1a;
   
-  --muted: #f1f5f9; /* slate-100 */
-  --muted-foreground: #64748b; /* slate-500 */
+  --muted: #f5f5f5;
+  --muted-foreground: #555555;
   
-  --accent: #f1f5f9; /* slate-100 */
-  --accent-foreground: #0f172a; /* slate-900 */
+  --accent: #f5f5f5;
+  --accent-foreground: #1a1a1a;
   
-  --secondary: #e2e8f0; /* slate-200 */
-  --secondary-foreground: #0f172a;
+  --secondary: #f0f0f0;
+  --secondary-foreground: #1a1a1a;
   
-  --border: #e2e8f0; /* slate-200 */
-  --input: #e2e8f0;
-  --ring: #94a3b8; /* slate-400 */
+  --border: #e6e6e6;
+  --input: #e6e6e6;
+  --ring: #ff5715; /* Substack Orange */
   
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  /* Default Preset (Blue) */
-  --primary: #2563eb; /* blue-600 */
+  /* Default Preset (Orange) */
+  --primary: #ff5715; 
   --primary-foreground: #ffffff;
 }
 
 [data-mode="dark"] {
-  /* Base Dark Theme (Slate) */
-  --background: #020617; /* slate-950 */
-  --foreground: #f8fafc; /* slate-50 */
+  /* Substack-inspired Dark Theme */
+  --background: #131313;
+  --foreground: #e6e6e6;
   
-  --muted: #1e293b; /* slate-800 */
-  --muted-foreground: #94a3b8; /* slate-400 */
+  --muted: #1f1f1f;
+  --muted-foreground: #a3a3a3;
   
-  --accent: #1e293b; /* slate-800 */
-  --accent-foreground: #f8fafc; /* slate-50 */
+  --accent: #1f1f1f;
+  --accent-foreground: #e6e6e6;
   
-  --secondary: #1e293b; /* slate-800 */
-  --secondary-foreground: #f8fafc;
+  --secondary: #262626;
+  --secondary-foreground: #e6e6e6;
   
-  --border: #1e293b; /* slate-800 */
-  --input: #1e293b;
-  --ring: #1e293b;
+  --border: #2e2e2e;
+  --input: #2e2e2e;
+  --ring: #ff5715;
   
   --destructive: #7f1d1d;
   --destructive-foreground: #fef2f2;
 
-  /* Default Preset (Blue) */
-  --primary: #3b82f6; /* blue-500 */
+  /* Default Preset (Orange) */
+  --primary: #ff5715;
   --primary-foreground: #ffffff;
 }
 
-/* --- Presets --- */
-
-/* Matcha (Green) */
-[data-preset="matcha"] {
-  --primary: #16a34a; /* green-600 */
-  --ring: #16a34a;
-}
-[data-mode="dark"][data-preset="matcha"] {
-  --primary: #22c55e; /* green-500 */
-  --ring: #22c55e;
+body {
+  font-family: var(--font-serif);
 }
 
-/* Rose (Pink) */
-[data-preset="rose"] {
-  --primary: #e11d48; /* rose-600 */
-  --ring: #e11d48;
-}
-[data-mode="dark"][data-preset="rose"] {
-  --primary: #fb7185; /* rose-400 */
-  --ring: #fb7185;
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
 }
 
-/* Sunset (Orange) */
-[data-preset="sunset"] {
-  --primary: #ea580c; /* orange-600 */
-  --ring: #ea580c;
-}
-[data-mode="dark"][data-preset="sunset"] {
-  --primary: #fb923c; /* orange-400 */
-  --ring: #fb923c;
-}
-
-/* B&W (Zinc) */
-[data-preset="bw"] {
-  --primary: #18181b; /* zinc-900 */
-  --primary-foreground: #fafafa;
-  --ring: #18181b;
-}
-[data-mode="dark"][data-preset="bw"] {
-  --primary: #fafafa; /* zinc-50 */
-  --primary-foreground: #18181b;
-  --ring: #fafafa;
+button, input, select, textarea, label, .font-sans {
+  font-family: var(--font-sans);
 }
 
 body {

@@ -6,15 +6,18 @@ import { usePosts } from '@/hooks/usePosts';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Calendar, User, Clock, Edit2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Share2, MessageCircle, Heart } from 'lucide-react';
 import Loader from '@/components/Loader';
+import DOMPurify from 'dompurify';
 
 export default function PostDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { getPost, fetchPosts, deletePost, loading, posts } = usePosts();
+  const { getPost, fetchPosts, deletePost, likePost, addComment, loading, posts } = usePosts();
   const [post, setPost] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [showComments, setShowComments] = useState(false);
 
   useEffect(() => {
     const loadPost = async () => {
@@ -27,7 +30,7 @@ export default function PostDetailPage() {
       }
     };
     loadPost();
-  }, [id, posts.length, fetchPosts, getPost]);
+  }, [id, posts, fetchPosts, getPost]); // Added posts dependency to refresh when likes/comments change
 
   const handleDelete = async () => {
     if (confirm('Are you sure you want to delete this post?')) {
@@ -35,6 +38,17 @@ export default function PostDetailPage() {
       await deletePost(Number(id));
       router.push('/dashboard');
     }
+  };
+
+  const handleLike = () => {
+    likePost(Number(id));
+  };
+
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    addComment(Number(id), commentText);
+    setCommentText('');
   };
 
   if (loading && !post) {
@@ -58,125 +72,166 @@ export default function PostDetailPage() {
 
   if (!post) return null;
 
-  return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Hero Image */}
-      <div className="relative h-[40vh] w-full md:h-[50vh]">
-        <Image
-          src={post.image || `https://picsum.photos/seed/${post.id}/1200/600`}
-          alt={post.title}
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-        
-        <div className="absolute bottom-0 left-0 right-0 container mx-auto px-4 pb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-4xl mx-auto"
-          >
-            <Link 
-              href="/dashboard" 
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors bg-black/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium"
-            >
-              <ArrowLeft size={16} />
-              Back to Dashboard
-            </Link>
-            
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight shadow-sm">
-              {post.title}
-            </h1>
-            
-            <div className="flex flex-wrap items-center gap-6 text-white/90">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                  <User size={20} className="text-white" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs opacity-70">Author</span>
-                  <span className="font-medium">John Doe</span>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                  <Calendar size={20} className="text-white" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs opacity-70">Published</span>
-                  <span className="font-medium">{new Date().toLocaleDateString()}</span>
-                </div>
-              </div>
+  const sanitizedContent = typeof window !== 'undefined' 
+    ? DOMPurify.sanitize(post.body) 
+    : post.body;
 
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                  <Clock size={20} className="text-white" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs opacity-70">Read Time</span>
-                  <span className="font-medium">5 min read</span>
-                </div>
+  return (
+    <div className="min-h-screen bg-background pb-20 pt-8">
+      <article className="max-w-3xl mx-auto px-4">
+        <div className="mb-8">
+          <Link 
+            href="/dashboard" 
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
+          >
+            <ArrowLeft size={16} />
+            Back
+          </Link>
+        </div>
+
+        <header className="mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 font-serif leading-tight tracking-tight">
+            {post.title}
+          </h1>
+          
+          <div className="flex items-center justify-between py-6 border-t border-b border-border">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-muted overflow-hidden relative">
+                <Image 
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId || 'author'}`}
+                  alt="Author"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="font-medium text-foreground">John Doe</span>
+                <span className="text-sm text-muted-foreground">
+                  {new Date().toLocaleDateString()}
+                </span>
               </div>
             </div>
-          </motion.div>
-        </div>
-      </div>
 
-      {/* Content */}
-      <main className="container mx-auto px-4 -mt-8 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="max-w-4xl mx-auto bg-card rounded-2xl shadow-xl border border-border p-8 md:p-12"
-        >
-          <div className="prose prose-lg dark:prose-invert max-w-none">
-            <p className="lead text-xl text-muted-foreground mb-8 leading-relaxed">
-              {post.body}
-            </p>
-            
-            {/* Simulated extra content for better reading experience */}
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            </p>
-            <h3>Why this matters</h3>
-            <p>
-              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
-            <ul>
-              <li>Key insight number one about {post.title}</li>
-              <li>Another important point to consider</li>
-              <li>Final thoughts on the subject</li>
-            </ul>
-            <p>
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-            </p>
-          </div>
-
-          <div className="mt-12 pt-8 border-t border-border flex justify-between items-center">
-            <div className="flex gap-4">
-              <Link
-                href={`/posts/${post.id}/edit`}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium"
+            <div className="flex items-center gap-4 text-muted-foreground">
+              <button className="hover:text-foreground transition-colors" title="Share">
+                <Share2 size={20} />
+              </button>
+              <div className="h-4 w-px bg-border mx-1"></div>
+              <Link 
+                href={`/posts/${post.id}/edit`} 
+                className="hover:text-primary transition-colors"
+                title="Edit"
               >
-                <Edit2 size={18} />
-                Edit Post
+                <Edit2 size={20} />
               </Link>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors font-medium disabled:opacity-50"
+              <button 
+                onClick={handleDelete} 
+                disabled={isDeleting} 
+                className="hover:text-destructive transition-colors"
+                title="Delete"
               >
-                <Trash2 size={18} />
-                {isDeleting ? 'Deleting...' : 'Delete Post'}
+                <Trash2 size={20} />
               </button>
             </div>
           </div>
-        </motion.div>
-      </main>
+        </header>
+
+        <div className="relative w-full aspect-[16/9] mb-10 rounded-md overflow-hidden bg-muted">
+          <Image
+            src={post.image || `https://picsum.photos/seed/${post.id}/1200/600`}
+            alt={post.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+
+        <div 
+          className="prose prose-lg prose-stone dark:prose-invert max-w-none font-serif leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+        />
+        
+        <div className="mt-12 pt-8 border-t border-border">
+           <div className="flex items-center justify-between text-muted-foreground mb-8">
+             <div className="flex gap-6">
+                <button 
+                  onClick={handleLike}
+                  className="flex items-center gap-2 hover:text-primary transition-colors group"
+                >
+                   <Heart size={20} className={post.likes > 0 ? "fill-primary text-primary" : "group-hover:text-primary"} />
+                   <span>{post.likes || 0} Likes</span>
+                </button>
+                <button 
+                  onClick={() => setShowComments(!showComments)}
+                  className="flex items-center gap-2 hover:text-foreground transition-colors"
+                >
+                   <MessageCircle size={20} />
+                   <span>{post.comments?.length || 0} Comments</span>
+                </button>
+             </div>
+           </div>
+
+           {showComments && (
+             <motion.div 
+               initial={{ opacity: 0, height: 0 }}
+               animate={{ opacity: 1, height: 'auto' }}
+               className="space-y-8"
+             >
+               <form onSubmit={handleCommentSubmit} className="flex gap-4">
+                 <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0 relative">
+                    <Image 
+                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=currentUser`}
+                      alt="You"
+                      fill
+                      className="object-cover"
+                    />
+                 </div>
+                 <div className="flex-1">
+                   <textarea
+                     value={commentText}
+                     onChange={(e) => setCommentText(e.target.value)}
+                     placeholder="Write a comment..."
+                     className="w-full p-4 bg-muted/50 rounded-xl border-none focus:ring-2 focus:ring-primary/20 resize-none min-h-[100px] font-sans"
+                   />
+                   <div className="flex justify-end mt-2">
+                     <button 
+                       type="submit"
+                       disabled={!commentText.trim()}
+                       className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                     >
+                       Post Comment
+                     </button>
+                   </div>
+                 </div>
+               </form>
+
+               <div className="space-y-6">
+                 {post.comments?.map((comment: any) => (
+                   <div key={comment.id} className="flex gap-4">
+                     <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0 relative">
+                        <Image 
+                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.author}`}
+                          alt={comment.author}
+                          fill
+                          className="object-cover"
+                        />
+                     </div>
+                     <div>
+                       <div className="flex items-center gap-2 mb-1">
+                         <span className="font-medium text-foreground">{comment.author}</span>
+                         <span className="text-xs text-muted-foreground">
+                           {new Date(comment.date).toLocaleDateString()}
+                         </span>
+                       </div>
+                       <p className="text-foreground/80 leading-relaxed">{comment.text}</p>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             </motion.div>
+           )}
+        </div>
+      </article>
     </div>
   );
 }
